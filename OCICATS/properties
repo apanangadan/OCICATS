@@ -1,0 +1,14 @@
+Consumer Key (API Key)	lKbAU1HGL9gvhDrrQFZJcWmPL (manage keys and access tokens)
+Callback URL	None
+Callback URL Locked	No
+Sign in with Twitter	Yes
+App-only authentication	https://api.twitter.com/oauth2/token
+Request token URL	https://api.twitter.com/oauth/request_token
+Authorize URL	https://api.twitter.com/oauth/authorize
+Access token URL	https://api.twitter.com/oauth/access_token
+
+Consumer Key (API Key)	lKbAU1HGL9gvhDrrQFZJcWmPL
+Consumer Secret (API Secret)	BzgQDhlTTlabeV1GpXl03r3PG8l3Dzvsz62Hf0rIF11Te0lgLw
+Access Token	1294010874-3ox2NoXAHJFKxWClvkRxdq1SerkOAlgU9UnkFKa
+Access Token Secret	0s031kt3jyET8OKEYKNlhZNEFinPotZR0OQ3WSN7Ulcto
+

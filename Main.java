@@ -42,7 +42,7 @@ public class Main
 	private JComboBox<String> negativeTopicsLists = new JComboBox<String>();
 	private JFileChooser directorySelect = new JFileChooser();
 
-	private String[] keyWords = {"transit"};
+	private String[] keyWords = {"transit", "metro", "train", "bus"};
 	
 	private String directoryFiles = "";
 	

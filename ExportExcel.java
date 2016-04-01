@@ -41,13 +41,30 @@ public class ExportExcel {
 		HSSFSheet sheet = wb.createSheet("Results");
 
 		String[] cellValue = new String[8];
-
-		for (int i = 0; i < tweetsdata.size(); i++) {
-			HSSFRow row = sheet.createRow(i);
+		
+		cellValue[0] = "User Name";
+		cellValue[1] = "User ID";
+		cellValue[2] = "Tweet Text";
+		cellValue[3] = "Location";
+		cellValue[4] = "Favorited Count";
+		cellValue[5] = "Retweet Count";
+		cellValue[6] = "TweetID";
+		cellValue[7] = "Time Stamp";
+		
+		HSSFRow row = sheet.createRow(1);
+		
+		for (int j = 0; j < cellValue.length; j++) {
+			HSSFCell cell = row.createCell(j);
+			HSSFRichTextString text = new HSSFRichTextString(cellValue[j]);
+			cell.setCellValue(text);
+		}
+ 
+		for (int i = 1; i < tweetsdata.size(); i++) {
+			row = sheet.createRow(i);
 			Status status = tweetsdata.get(i);
 
 			cellValue[0] = status.getUser().getName();
-			cellValue[1] = "" + status.getUser().getId();
+			cellValue[1] = "@" + status.getUser().getId();
 			cellValue[2] = status.getText();
 			if(status.getGeoLocation() != null)
 				cellValue[3] = "" + status.getGeoLocation().getLatitude() + "," + status.getGeoLocation().getLongitude();

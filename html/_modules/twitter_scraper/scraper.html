@@ -1,0 +1,311 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>twitter_scraper.scraper &mdash; TwitterScraper  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="top" title="TwitterScraper  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TwitterScraper  documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for twitter_scraper.scraper</h1><div class="highlight"><pre>
+<span class="kn">from</span> <span class="nn">selenium</span> <span class="kn">import</span> <span class="n">webdriver</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.common.keys</span> <span class="kn">import</span> <span class="n">Keys</span>
+<span class="kn">from</span> <span class="nn">selenium.webdriver.firefox.firefox_binary</span> <span class="kn">import</span> <span class="n">FirefoxBinary</span>
+
+<span class="kn">from</span> <span class="nn">bs4</span> <span class="kn">import</span> <span class="n">BeautifulSoup</span>
+
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="kn">as</span> <span class="nn">pd</span>
+
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">namedtuple</span>
+<span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">string</span>
+<span class="kn">import</span> <span class="nn">types</span>
+
+
+<span class="n">tweet_struct</span> <span class="o">=</span> <span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;tweet_struct&#39;</span><span class="p">,</span>
+                           <span class="p">[</span>
+                              <span class="s1">&#39;tweet_id&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;user_id&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;display_name&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;profile_name&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;avatar&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;datetime&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;language&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;text&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;retweets&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;likes&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;location&#39;</span><span class="p">,</span>
+                              <span class="s1">&#39;promoted&#39;</span>
+                           <span class="p">])</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A simple structure that holds the tweet information.</span>
+
+<span class="sd">It includes only the information available from the basic tweet listing page.</span>
+
+<span class="sd">Attributes:</span>
+<span class="sd">   tweet_id: String id. Not an integer because it can get very large.</span>
+<span class="sd">   user_id: String id. Not an integer because it can get very large.</span>
+<span class="sd">   display_name: String name. Represents the bolded name shown on the tweet. May not be a valid Twitter handle.</span>
+<span class="sd">   profile_name: String twitter handle. Does not start with &#39;@&#39;.</span>
+<span class="sd">   avatar: String url. Points to the image.</span>
+<span class="sd">   datetime: Pandas Timestamp. Represents the time the tweet was posted. Given to the minute.</span>
+<span class="sd">   language: String language code marked on the tweet.</span>
+<span class="sd">   text: String text. This is the entire contents of the tweet.</span>
+<span class="sd">   retweets: Integer. This may not be an accurate count. After a thousand retweets, it is given with at most 2 significant digits.</span>
+<span class="sd">   likes: Integer. This may not be an accurate count. After a thousand likes, it is given with at most 2 significant digits.</span>
+<span class="sd">   location: String location. This may take many forms. It can be as broad as a full country name or coordinates.</span>
+<span class="sd">   promoted: Boolean. Twitter sometimes moves particular tweets to the top of the page. Such tweets are considered promoted.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="TweetScraper"><a class="viewcode-back" href="../../twitter_scraper.html#twitter_scraper.scraper.TweetScraper">[docs]</a><span class="k">class</span> <span class="nc">TweetScraper</span><span class="p">:</span>
+   <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">   Used to scrape infinite-scrolling Twitter pages.</span>
+
+<span class="sd">   Attributes:</span>
+<span class="sd">      remaining_estimator: Function (tweet_struct_list, \*args, \*\*kwargs) -&gt; estimated number of tweets remaining to be scraped.</span>
+<span class="sd">      driver_make: Function () -&gt; valid selenium webdriver.</span>
+<span class="sd">      processor_list: List of functions (tweet_struct_collection, \*\*kwargs) -&gt; modified_tweet_struct_collection. Will be applied in order after scraping is complete.</span>
+<span class="sd">      base_twitter_search_url: String containing the url for an unparameterized search for Twitter.</span>
+<span class="sd">      append_search_terms: String or list of strings for terms to be added to any search.</span>
+<span class="sd">      display_postfixes: Dictionary mapping the short alphabetic postfix used for large numbers.</span>
+<span class="sd">      wait: Number in seconds used to set the implicit_wait value for the driver.</span>
+<span class="sd">      sleep: Number in seconds to sleep between scrolls.</span>
+<span class="sd">      retry_end: Maximum number of attempts to get the page to continue scrolling before giving up.</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="n">remaining_estimator</span> <span class="o">=</span> <span class="bp">None</span>
+   <span class="n">driver_maker</span> <span class="o">=</span> <span class="bp">None</span>
+   <span class="n">processor_list</span> <span class="o">=</span> <span class="bp">None</span>
+
+   <span class="n">_tweets_per_scroll_est</span> <span class="o">=</span> <span class="mi">1</span>
+   <span class="n">base_twitter_search_url</span> <span class="o">=</span> <span class="s2">&quot;http://twitter.com/search?q=&quot;</span>
+   <span class="n">append_search_terms</span> <span class="o">=</span> <span class="bp">None</span>
+
+   <span class="n">display_postfixes</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;K&#39;</span> <span class="p">:</span> <span class="mi">1000</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span> <span class="p">:</span> <span class="mi">1000000</span><span class="p">}</span>
+
+   <span class="n">wait</span> <span class="o">=</span> <span class="bp">None</span>
+   <span class="n">sleep</span> <span class="o">=</span> <span class="bp">None</span>
+   <span class="n">retry_end</span> <span class="o">=</span> <span class="bp">None</span>
+
+
+   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                <span class="n">remaining_estimator</span><span class="p">,</span>
+                <span class="n">driver_maker</span> <span class="o">=</span> <span class="n">webdriver</span><span class="o">.</span><span class="n">Firefox</span><span class="p">,</span>
+                <span class="n">wait</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+                <span class="n">sleep</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="n">retry_end</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
+                <span class="n">processor_list</span> <span class="o">=</span> <span class="p">[],</span>
+                <span class="n">append_search_terms</span> <span class="o">=</span> <span class="p">[]):</span>
+      <span class="sd">&quot;&quot;&quot;Inits TweetScraper to a basic state. Requires an estimation function.&quot;&quot;&quot;</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">remaining_estimator</span> <span class="o">=</span> <span class="n">remaining_estimator</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">driver_maker</span> <span class="o">=</span> <span class="n">driver_maker</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">processor_list</span> <span class="o">=</span> <span class="n">processor_list</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">append_search_terms</span> <span class="o">=</span> <span class="n">append_search_terms</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">wait</span> <span class="o">=</span> <span class="n">wait</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">sleep</span> <span class="o">=</span> <span class="n">sleep</span>
+      <span class="bp">self</span><span class="o">.</span><span class="n">retry_end</span> <span class="o">=</span> <span class="n">retry_end</span>
+
+   <span class="k">def</span> <span class="nf">_make_twitter_url</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_terms</span><span class="p">):</span>
+      <span class="n">url</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_twitter_search_url</span> <span class="o">+</span> <span class="n">search_terms</span>
+
+      <span class="n">append_search_terms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">append_search_terms</span>
+
+      <span class="k">if</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">append_search_terms</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">append_search_terms</span><span class="p">,</span> <span class="n">collections</span><span class="o">.</span><span class="n">Iterable</span><span class="p">)):</span>
+         <span class="n">append_search_terms</span> <span class="o">=</span> <span class="p">[</span><span class="n">append_search_terms</span><span class="p">]</span>
+
+      <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">append_search_terms</span><span class="p">:</span>
+         <span class="n">url</span> <span class="o">+=</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">term</span>
+
+      <span class="k">return</span> <span class="n">url</span>
+
+   <span class="nd">@staticmethod</span>
+   <span class="k">def</span> <span class="nf">_get_element_attribute_by_class_if_exists</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">elem_type</span><span class="p">,</span> <span class="n">class_name</span><span class="p">,</span> <span class="n">attribute</span><span class="p">):</span>
+      <span class="k">try</span><span class="p">:</span>
+         <span class="k">return</span> <span class="n">e</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="n">elem_type</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="n">class_name</span><span class="p">})[</span><span class="n">attribute</span><span class="p">]</span>
+      <span class="k">except</span><span class="p">:</span>
+         <span class="k">return</span> <span class="bp">None</span>
+
+   <span class="k">def</span> <span class="nf">_parse_display_number</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">s</span><span class="p">):</span>
+      <span class="k">if</span> <span class="n">s</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+         <span class="k">return</span> <span class="mi">0</span>
+       
+      <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="ow">in</span> <span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">:</span>
+         <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+       
+      <span class="n">mult</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">display_postfixes</span><span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span>
+      <span class="n">parts</span> <span class="o">=</span> <span class="n">s</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+      <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="n">mult</span>
+      <span class="k">if</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">):</span>
+         <span class="n">val</span> <span class="o">+=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="nb">int</span><span class="p">(</span><span class="n">mult</span><span class="o">/</span><span class="mi">10</span><span class="p">)</span>
+      <span class="k">return</span> <span class="n">val</span>
+
+   <span class="c1"># Pandas is only used here to convert a datetime to a pandas.Timestamp</span>
+   <span class="c1"># A bit heavy, but easier to do it here than change the dtype later</span>
+   <span class="k">def</span> <span class="nf">_element_to_tweet_struct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
+      <span class="k">return</span> <span class="n">tweet_struct</span><span class="p">(</span>
+         <span class="n">tweet_id</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s2">&quot;data-tweet-id&quot;</span><span class="p">],</span>
+         <span class="n">user_id</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s2">&quot;data-user-id&quot;</span><span class="p">],</span>
+         <span class="n">display_name</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s2">&quot;data-name&quot;</span><span class="p">],</span>
+         <span class="n">profile_name</span> <span class="o">=</span> <span class="n">e</span><span class="p">[</span><span class="s2">&quot;data-screen-name&quot;</span><span class="p">],</span>
+         <span class="n">avatar</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;img&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;avatar&quot;</span><span class="p">})[</span><span class="s2">&quot;src&quot;</span><span class="p">],</span>
+         <span class="n">datetime</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">Timestamp</span><span class="p">(</span><span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;tweet-timestamp&quot;</span><span class="p">})[</span><span class="s2">&quot;title&quot;</span><span class="p">],</span> <span class="s1">&#39;%I:%M %p - </span><span class="si">%d</span><span class="s1"> %b %Y&#39;</span><span class="p">)),</span>
+         <span class="n">language</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;TweetTextSize&quot;</span><span class="p">})[</span><span class="s2">&quot;lang&quot;</span><span class="p">],</span>
+         <span class="n">text</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;p&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;TweetTextSize&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">,</span>
+         <span class="n">retweets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_display_number</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;button&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;js-actionRetweet&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;ProfileTweet-actionCountForPresentation&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">),</span>
+         <span class="n">likes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_parse_display_number</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;button&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;js-actionFavorite&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;ProfileTweet-actionCountForPresentation&quot;</span><span class="p">})</span><span class="o">.</span><span class="n">text</span><span class="p">),</span>
+         <span class="n">location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_element_attribute_by_class_if_exists</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;span&quot;</span><span class="p">,</span> <span class="s2">&quot;Tweet-geo&quot;</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">),</span>
+         <span class="n">promoted</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">has_attr</span><span class="p">(</span><span class="s2">&quot;data-relevance-type&quot;</span><span class="p">))</span>
+
+   <span class="k">def</span> <span class="nf">_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">initial</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">initial</span>
+    
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor_list</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="n">result</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    
+    <span class="k">return</span> <span class="n">result</span>
+
+<div class="viewcode-block" id="TweetScraper.get_tweets"><a class="viewcode-back" href="../../twitter_scraper.html#twitter_scraper.scraper.TweetScraper.get_tweets">[docs]</a>   <span class="k">def</span> <span class="nf">get_tweets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">search_terms</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+      <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">      Scrapes tweets, and applies the processing steps.</span>
+
+<span class="sd">      Args:</span>
+<span class="sd">         search_terms: The search term to be passed to Twitter.</span>
+<span class="sd">         *args: Extra arguments for remaining_estimator function.</span>
+<span class="sd">         **kwargs: Extra arguments for remaining_estimator function and all processing steps.</span>
+
+<span class="sd">      Returns:</span>
+<span class="sd">         All the scraped tweets after all processing steps have been applied.</span>
+<span class="sd">      &quot;&quot;&quot;</span>
+      <span class="n">driver</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">driver_maker</span><span class="p">()</span>
+      <span class="n">driver</span><span class="o">.</span><span class="n">implicitly_wait</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">wait</span><span class="p">)</span>
+    
+      <span class="n">scrolls</span> <span class="o">=</span> <span class="mi">1</span>
+      <span class="n">loads_until_check</span> <span class="o">=</span> <span class="mi">0</span>
+    
+      <span class="n">tweets</span> <span class="o">=</span> <span class="p">[]</span>
+    
+      <span class="n">retry_end_count</span> <span class="o">=</span> <span class="mi">0</span>
+    
+      <span class="k">try</span><span class="p">:</span>
+         <span class="n">driver</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_make_twitter_url</span><span class="p">(</span><span class="n">search_terms</span><span class="p">))</span>
+         <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">)</span>
+        
+         <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">loads_until_check</span><span class="p">):</span>
+               <span class="n">driver</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;window.scrollTo(0, document.body.scrollHeight);&quot;</span><span class="p">)</span>
+               <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">)</span>
+               <span class="k">if</span> <span class="n">driver</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;return window.innerHeight + window.scrollY &gt;= document.body.scrollHeight&quot;</span><span class="p">):</span>
+                  <span class="k">if</span> <span class="n">retry_end_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">retry_end</span><span class="p">:</span>
+                     <span class="k">break</span>
+                  <span class="k">else</span><span class="p">:</span>
+                     <span class="n">retry_end_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                     <span class="n">driver</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;window.scrollTo(0, 0);&quot;</span><span class="p">)</span>
+                     <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sleep</span><span class="p">)</span>
+
+                     <span class="c1"># No point rechecking estimation after the first time</span>
+                     <span class="k">if</span> <span class="n">retry_end_count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="k">continue</span>
+               <span class="k">else</span><span class="p">:</span>
+                  <span class="n">scrolls</span> <span class="o">+=</span> <span class="mi">1</span>
+                  <span class="n">retry_end_count</span> <span class="o">=</span> <span class="mi">0</span>
+            
+            <span class="c1"># Use original-tweet here because tweet attribute is shared with one or two non-tweets</span>
+            <span class="n">tweets</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_element_to_tweet_struct</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">BeautifulSoup</span><span class="p">(</span><span class="n">driver</span><span class="o">.</span><span class="n">page_source</span><span class="p">,</span> <span class="s2">&quot;lxml&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">findAll</span><span class="p">(</span><span class="s2">&quot;div&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;class&quot;</span> <span class="p">:</span> <span class="s2">&quot;original-tweet&quot;</span><span class="p">})]</span>
+            <span class="n">_tweets_per_scroll_est</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">floor</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tweets</span><span class="p">)</span> <span class="o">/</span> <span class="n">scrolls</span><span class="p">)</span> <span class="k">if</span> <span class="n">scrolls</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="n">_tweets_per_scroll_est</span>
+            
+            <span class="n">remaining_tweets</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">remaining_estimator</span><span class="p">(</span><span class="n">tweets</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            
+            <span class="k">if</span> <span class="n">remaining_tweets</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+               <span class="k">break</span><span class="p">;</span>
+
+            <span class="n">loads_until_check</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="n">remaining_tweets</span> <span class="o">/</span> <span class="n">_tweets_per_scroll_est</span><span class="p">)</span>
+            
+      <span class="k">finally</span><span class="p">:</span>
+         <span class="n">driver</span><span class="o">.</span><span class="n">quit</span><span class="p">()</span>
+    
+      <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_process</span><span class="p">(</span><span class="n">tweets</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TwitterScraper  documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Chris Vigus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

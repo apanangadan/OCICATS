@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Processor Rules &mdash; TwitterScraper  documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="TwitterScraper  documentation" href="index.html" />
+    <link rel="next" title="Future Work" href="future.html" />
+    <link rel="prev" title="Estimator Rules" href="est_rules.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="future.html" title="Future Work"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="est_rules.html" title="Estimator Rules"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TwitterScraper  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="processor-rules">
+<h1>Processor Rules<a class="headerlink" href="#processor-rules" title="Permalink to this headline">¶</a></h1>
+<p>A processor may</p>
+<blockquote>
+<div><ul class="simple">
+<li>Accept arguments from <a class="reference internal" href="twitter_scraper.html#twitter_scraper.scraper.TweetScraper.get_tweets" title="twitter_scraper.scraper.TweetScraper.get_tweets"><code class="xref py py-meth docutils literal"><span class="pre">twitter_scraper.scraper.TweetScraper.get_tweets()</span></code></a> via <code class="samp docutils literal"><span class="pre">**kwargs</span></code> .</li>
+<li>Return anything</li>
+</ul>
+</div></blockquote>
+<p>A processor must</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Accept something from a previous processor as the first argument</p>
+<blockquote>
+<div><ul class="simple">
+<li>The first processor must accept a list of <a class="reference internal" href="twitter_scraper.html#twitter_scraper.scraper.tweet_struct" title="twitter_scraper.scraper.tweet_struct"><code class="xref py py-class docutils literal"><span class="pre">twitter_scraper.scraper.tweet_struct</span></code></a> as the first parameter</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">Accept a <code class="samp docutils literal"><span class="pre">**kwargs</span></code> parameter</p>
+<blockquote>
+<div><ul class="simple">
+<li>Arguments for all processors will be contained in <code class="samp docutils literal"><span class="pre">**kwargs</span></code></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<p>A processor must not</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Share an argument name with another processor or the estimator</p>
+<blockquote>
+<div><ul class="simple">
+<li>Arguments for all processors, and potentially the estimator, will be contained in <code class="samp docutils literal"><span class="pre">**kwargs</span></code></li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="est_rules.html"
+                        title="previous chapter">Estimator Rules</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="future.html"
+                        title="next chapter">Future Work</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/proc_rules.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="future.html" title="Future Work"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="est_rules.html" title="Estimator Rules"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TwitterScraper  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Chris Vigus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

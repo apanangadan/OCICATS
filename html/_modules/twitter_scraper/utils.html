@@ -1,0 +1,130 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>twitter_scraper.utils &mdash; TwitterScraper  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="top" title="TwitterScraper  documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TwitterScraper  documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for twitter_scraper.utils</h1><div class="highlight"><pre>
+<span class="k">def</span> <span class="nf">write_excel_from_tweet_df</span><span class="p">(</span><span class="n">tweets_df</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">sheet_name</span> <span class="o">=</span> <span class="s2">&quot;tweets&quot;</span><span class="p">):</span>
+   <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="write_excel_from_tweet_df"><a class="viewcode-back" href="../../twitter_scraper.html#twitter_scraper.utils.write_excel_from_tweet_df">[docs]</a><span class="sd">   Simple function to write a dataframe of tweet_structs to an Excel file.</span>
+
+<span class="sd">   Args:</span>
+<span class="sd">      tweets_df: Tweet_struct dataframe.</span>
+<span class="sd">      path: Path for the Excel file to be written.</span>
+<span class="sd">      sheet_name: Name of the sheet to be written.</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="n">writer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;xlsxwriter&quot;</span><span class="p">,</span> <span class="n">datetime_format</span><span class="o">=</span><span class="s2">&quot;yyyy-mm-dd hh:mm&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;strings_to_urls&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">})</span>
+   <span class="n">tweets_df</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="n">sheet_name</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+   <span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">write_excel_from_dict_tweet_df</span><span class="p">(</span><span class="n">tweets_df_dict</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+   <span class="sd">&quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="write_excel_from_dict_tweet_df"><a class="viewcode-back" href="../../twitter_scraper.html#twitter_scraper.utils.write_excel_from_dict_tweet_df">[docs]</a><span class="sd">   Simple function to write a dictionary of dataframes of tweet_structs to an Excel file.</span>
+
+<span class="sd">   Each dataframe will be written to a separate sheet. The sheets will be named based on the key name.</span>
+
+<span class="sd">   Args:</span>
+<span class="sd">      tweets_df_dict: Dictionary of tweet_struct dataframes.</span>
+<span class="sd">      path: Path for the Excel file to be written.</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="n">writer</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelWriter</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">engine</span><span class="o">=</span><span class="s2">&quot;xlsxwriter&quot;</span><span class="p">,</span> <span class="n">datetime_format</span><span class="o">=</span><span class="s2">&quot;yyyy-mm-dd hh:mm&quot;</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;strings_to_urls&#39;</span><span class="p">:</span> <span class="bp">False</span><span class="p">})</span>
+   <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">tweets_df_dict</span><span class="p">:</span>
+      <span class="n">tweets_df_dict</span><span class="p">[</span><span class="n">term</span><span class="p">]</span><span class="o">.</span><span class="n">to_excel</span><span class="p">(</span><span class="n">writer</span><span class="p">,</span> <span class="n">sheet_name</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">term</span><span class="p">),</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span>
+   <span class="n">writer</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">read_excel_to_tweet_df_dict</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+   <span class="sd">&quot;&quot;&quot;</span></div>
+<div class="viewcode-block" id="read_excel_to_tweet_df_dict"><a class="viewcode-back" href="../../twitter_scraper.html#twitter_scraper.utils.read_excel_to_tweet_df_dict">[docs]</a><span class="sd">   Simple function to read an Excel file into a tweet_struct dataframe.</span>
+
+<span class="sd">   Args:</span>
+<span class="sd">      path: Path for the Excel file to be read.</span>
+<span class="sd">   &quot;&quot;&quot;</span>
+   <span class="n">tweets_file</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">ExcelFile</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+   <span class="k">return</span> <span class="p">{</span><span class="n">term</span> <span class="p">:</span> <span class="n">tweets_file</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">term</span><span class="p">,</span> <span class="n">converters</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;tweet_id&quot;</span> <span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;user_id&quot;</span> <span class="p">:</span> <span class="nb">str</span><span class="p">})</span> <span class="k">for</span> <span class="n">term</span> <span class="ow">in</span> <span class="n">tweets_file</span><span class="o">.</span><span class="n">sheet_names</span><span class="p">}</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">TwitterScraper  documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Chris Vigus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

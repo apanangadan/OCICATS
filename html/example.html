@@ -1,0 +1,136 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Example &mdash; TwitterScraper  documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="TwitterScraper  documentation" href="index.html" />
+    <link rel="next" title="twitter_scraper package" href="twitter_scraper.html" />
+    <link rel="prev" title="Future Work" href="future.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="twitter_scraper.html" title="twitter_scraper package"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="future.html" title="Future Work"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TwitterScraper  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="example">
+<h1>Example<a class="headerlink" href="#example" title="Permalink to this headline">¶</a></h1>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">twitter_scraper</span> <span class="kn">import</span> <span class="n">scraper</span>
+<span class="kn">import</span> <span class="nn">twitter_scraper.estimators</span> <span class="kn">as</span> <span class="nn">est</span>
+<span class="kn">import</span> <span class="nn">twitter_scraper.processors</span> <span class="kn">as</span> <span class="nn">proc</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="n">some_term</span> <span class="o">=</span> <span class="s2">&quot;some term&quot;</span>
+<span class="n">start_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">)</span>
+<span class="n">end_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="p">(</span><span class="mi">2016</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">9</span><span class="p">)</span>
+
+
+<span class="n">ts</span> <span class="o">=</span> <span class="n">scraper</span><span class="o">.</span><span class="n">TweetScraper</span><span class="p">(</span><span class="n">est</span><span class="o">.</span><span class="n">until_datetime</span><span class="p">,</span>
+                          <span class="n">append_search_terms</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;lang:en&quot;</span><span class="p">,</span> <span class="s2">&quot;include:retweets&quot;</span><span class="p">],</span>
+                          <span class="n">processor_list</span><span class="o">=</span><span class="p">[</span><span class="n">proc</span><span class="o">.</span><span class="n">list_to_df</span><span class="p">,</span> <span class="n">proc</span><span class="o">.</span><span class="n">df_add_am_pm</span><span class="p">,</span> <span class="n">proc</span><span class="o">.</span><span class="n">df_between_datetimes</span><span class="p">,</span> <span class="n">proc</span><span class="o">.</span><span class="n">df_reindex</span><span class="p">])</span>
+
+<span class="n">tweets</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">get_tweets</span><span class="p">(</span><span class="n">some_term</span><span class="p">,</span> <span class="n">until_datetime</span> <span class="o">=</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">pstart_datetime</span> <span class="o">=</span> <span class="n">start_date</span><span class="p">,</span> <span class="n">pend_datetime</span> <span class="o">=</span> <span class="n">end_date</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="future.html"
+                        title="previous chapter">Future Work</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="twitter_scraper.html"
+                        title="next chapter">twitter_scraper package</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/example.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="twitter_scraper.html" title="twitter_scraper package"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="future.html" title="Future Work"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TwitterScraper  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Chris Vigus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

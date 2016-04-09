@@ -1,0 +1,164 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Estimator Rules &mdash; TwitterScraper  documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="TwitterScraper  documentation" href="index.html" />
+    <link rel="next" title="Processor Rules" href="proc_rules.html" />
+    <link rel="prev" title="Limitations" href="limitations.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="proc_rules.html" title="Processor Rules"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="limitations.html" title="Limitations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TwitterScraper  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="estimator-rules">
+<h1>Estimator Rules<a class="headerlink" href="#estimator-rules" title="Permalink to this headline">¶</a></h1>
+<p>An estimator may</p>
+<blockquote>
+<div><ul class="simple">
+<li>Accept arguments from <a class="reference internal" href="twitter_scraper.html#twitter_scraper.scraper.TweetScraper.get_tweets" title="twitter_scraper.scraper.TweetScraper.get_tweets"><code class="xref py py-meth docutils literal"><span class="pre">twitter_scraper.scraper.TweetScraper.get_tweets()</span></code></a> via <code class="samp docutils literal"><span class="pre">*args</span></code> or <code class="samp docutils literal"><span class="pre">**kwargs</span></code>.</li>
+</ul>
+</div></blockquote>
+<p>An estimator must</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Accept a list of <a class="reference internal" href="twitter_scraper.html#twitter_scraper.scraper.tweet_struct" title="twitter_scraper.scraper.tweet_struct"><code class="xref py py-class docutils literal"><span class="pre">twitter_scraper.scraper.tweet_struct</span></code></a> as the first parameter</p>
+</li>
+<li><dl class="first docutils">
+<dt>Accept <code class="samp docutils literal"><span class="pre">**kwargs</span></code> as a parameter</dt>
+<dd><ul class="first last simple">
+<li>Processors also receive arguments via <code class="samp docutils literal"><span class="pre">**kwargs</span></code> from <a class="reference internal" href="twitter_scraper.html#twitter_scraper.scraper.TweetScraper.get_tweets" title="twitter_scraper.scraper.TweetScraper.get_tweets"><code class="xref py py-meth docutils literal"><span class="pre">twitter_scraper.scraper.TweetScraper.get_tweets()</span></code></a></li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">Return a number</p>
+</li>
+<li><dl class="first docutils">
+<dt>Eventually return a number less than or equal to zero</dt>
+<dd><ul class="first last simple">
+<li>Scraping will continue until this occurs, or no more tweets are being loaded</li>
+</ul>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+<p>An estimator should</p>
+<blockquote>
+<div><ul>
+<li><p class="first">Be as accurate as possible, but error on the high side</p>
+<blockquote>
+<div><ul class="simple">
+<li>Low estimates will incur significant extra costs with needless parsing of the source</li>
+<li>High estimates will spend extra time loading unneeded tweets</li>
+</ul>
+</div></blockquote>
+</li>
+</ul>
+</div></blockquote>
+<p>See <a class="reference internal" href="twitter_scraper.html#module-twitter_scraper.estimators" title="twitter_scraper.estimators"><code class="xref py py-mod docutils literal"><span class="pre">twitter_scraper.estimators</span></code></a> for concrete examples.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="limitations.html"
+                        title="previous chapter">Limitations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="proc_rules.html"
+                        title="next chapter">Processor Rules</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/est_rules.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="proc_rules.html" title="Processor Rules"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="limitations.html" title="Limitations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TwitterScraper  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Chris Vigus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Future Work &mdash; TwitterScraper  documentation</title>
+    
+    <link rel="stylesheet" href="_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="top" title="TwitterScraper  documentation" href="index.html" />
+    <link rel="next" title="Example" href="example.html" />
+    <link rel="prev" title="Processor Rules" href="proc_rules.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="example.html" title="Example"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="proc_rules.html" title="Processor Rules"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TwitterScraper  documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="future-work">
+<h1>Future Work<a class="headerlink" href="#future-work" title="Permalink to this headline">¶</a></h1>
+<p>The next step in this work is decoupling the page scrolling from the Python program.</p>
+<p>This should be possible by moving the scrolling code into the browser with Javascript. One way to do this is</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">driver</span><span class="o">.</span><span class="n">execute_script</span><span class="p">(</span><span class="s2">&quot;return window.setInterval(function(){window.scrollTo(0, document.body.scrollHeight);}, ms_poll_time)&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This has been explored briefly and seems quite promising. Care needs to be taken to keep the poll time slow enough that the browser is able to produce the current page source in a reasonable time.</p>
+<p>Additionally, there needs to be some handling of the situation where no more tweets load. Although this may be caused by Twitter simply being unwilling to serve any more tweets, it can also result from the page simply getting stuck and not recognizing the scroll down. This mostly seems to happen when the scroll distance is low, and tweets are being loaded slowly.</p>
+<dl class="docutils">
+<dt>When Twitter won&#8217;t load any more tweets, the scraper needs to recognize this and stop</dt>
+<dd>Scrolling up and then back down resolves the issue. When the page simply got stuck, it can be fixed by scrolling back up and then down again.</dd>
+</dl>
+<p>If this extra logic is also implemented in Javascript, then it needs to have a way to signal Python that it is done. If it is done in Python it will be somewhat slower, although as long as it is done in parallel with the page source parsing it shouldn&#8217;t be significant.</p>
+<p>The benefits of this will be two-fold. The first and most important is that it should provide a significant speedup. Secondly, it will remove the need for estimations. Instead, similar functions can take their place that merely need to return a boolean, indicating if scraping should continue or not.</p>
+<p>In the mean time, pushing for more aggressive <a class="reference internal" href="twitter_scraper.html#twitter_scraper.scraper.TweetScraper.sleep" title="twitter_scraper.scraper.TweetScraper.sleep"><code class="xref py py-attr docutils literal"><span class="pre">twitter_scraper.scraper.TweetScraper.sleep</span></code></a> times may help reduce the need for this extra work. There is some significant time spent communicating the requests, so effective values may be somewhat higher than what is set.</p>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="proc_rules.html"
+                        title="previous chapter">Processor Rules</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="example.html"
+                        title="next chapter">Example</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/future.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="example.html" title="Example"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="proc_rules.html" title="Processor Rules"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">TwitterScraper  documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Chris Vigus.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

@@ -1,3 +1,4 @@
+
 package SOI;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -52,7 +53,8 @@ public class ExportExcel {
 			if(status.getGeoLocation() != null)
 				cellValue[3] = "" + status.getGeoLocation().getLatitude() + "," + status.getGeoLocation().getLongitude();
 			else
-				cellValue[3] = "";
+//				cellValue[3] = "";
+                                cellValue[3] = status.getUser().getLocation();
 			cellValue[4] = "" + status.getFavoriteCount();
 			cellValue[5] = "" + status.getRetweetCount();
 			cellValue[6] = "" + status.getId();

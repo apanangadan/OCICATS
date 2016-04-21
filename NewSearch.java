@@ -1,3 +1,4 @@
+
 package SOI;
 
 import java.awt.Color;
@@ -6,7 +7,10 @@ import java.util.List;
 
 import javax.swing.JFrame;
 
+import java.util.Map;
+
 import twitter4j.Status;
+import twitter4j.User;
 
 public class NewSearch {
 
@@ -39,6 +43,10 @@ public class NewSearch {
 	{
 		searchingFunction search = new searchingFunction(searchText);
 		List<Status>  tweets = search.searchTweets();
+                
+                retweetRankingFunction rtRank = new retweetRankingFunction(tweets);
+                Map<User,Long> retweetRanking = rtRank.retweetRankCount();
+//                List<User> retweetRankingList = rtRank.retweetRankList();
 		
 		ExportExcel e = new ExportExcel(path);
 		e.exportExcel(tweets);
@@ -58,3 +66,4 @@ public class NewSearch {
 	}
 	
 }
+

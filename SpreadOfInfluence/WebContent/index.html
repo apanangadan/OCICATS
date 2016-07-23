@@ -1,0 +1,152 @@
+<!doctype html>
+<html ng-app="myapp">
+
+<head>
+	<title>Spread Of Influence</title>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.css">
+	<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+	<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+
+<body ng-controller="soi" ng-cloak>
+	<!--H-E-A-D-E-R-->
+	<header>
+		<nav>
+			<div>
+				<md-content>
+					<md-toolbar class="md-hue-2">
+						<div class="md-toolbar-tools">
+							<h2><span>Spread Of Influence</span> </h2>
+							<span flex></span>
+						</div>
+					</md-toolbar>
+				</md-content>
+			</div>
+		</nav>
+	</header>
+	<!--M-A-I-N-->
+	<main>
+		<div class="md-padding" layout="column">
+			<md-content layout-padding>
+
+				<form ng-submit="findInfluentialPeople()" layout="row" layout-wrap>
+					<div flex="40">
+						<md-input-container>
+							<label>Topic</label>
+							<md-select ng-model="selectedTopic">
+								<md-option ng-repeat="topic in topics" value="{{topic}}">
+									{{topic}}
+								</md-option>
+							</md-select>
+						</md-input-container>
+					</div>
+					<div flex="5"></div>
+					<div flex="30">
+						<p>Search by: <span class="radioValue">{{ group }}</span> </p>
+						<md-radio-group ng-model="group" layout="row">
+							<md-radio-button value="Mentions" class="md-primary">Mentions</md-radio-button>
+							<md-radio-button value="Retweets" class="md-primary">Retweets</md-radio-button>
+						</md-radio-group>
+					</div>
+					<div flex="25">
+						<md-button type="submit" class="md-raised md-primary">Find Influencers</md-button>
+					</div>
+				</form>
+			</md-content>
+
+
+
+
+			<div layout="row" layout-wrap>
+				<div flex="20">
+					<md-list flex class="md-dense">
+						<md-subheader class="md-no-sticky">Influential Twitter Handles</md-subheader>
+						<!-- <md-progress-circular ng-hide="searchComplete" class="md-primry" md-diameter="40"> -->
+						<md-progress-linear md-mode="indeterminate" ng-hide="searchComplete" class="md-primry"></md-progress-linear>
+						</md-progress-circular>
+						<md-list-item class="md-2-line" ng-repeat="people in influentials|orderBy:total_retweets:true|limitTo:10" ng-click="getTweets(people)">
+							<!-- <img ng-src="{{todos[0].face}}?20" class="md-avatar" alt="{{todos[0].who}}" /> -->
+							<div class="md-list-item-text">
+								<h3>{{people.name}}</h3>
+								<p ng-if="rankedby == 'retweets'">Retweets : {{people.total_retweets}}</p>
+								<p ng-if="rankedby == 'mentions'">Mentions : {{people.total_retweets}}</p>
+							</div>
+						</md-list-item>
+						<md-list-item class="md-2-line" ng-show="!influentials.length && searchComplete">
+							<div class="md-list-item-text">
+								<h3>No influential Handles found</h3>
+								<p>Please try again with different search criteria</p>
+							</div>
+						</md-list-item>
+					</md-list>
+				</div>
+				<div flex></div>
+				<div flex="30">
+					<md-list flex class="md-dense" ng-show="searchComplete && selectedUser">
+						 <md-subheader class="md-no-sticky">Tweets by {{selectedUser}}</md-subheader>
+						<md-list-item class="md-3-line md-long-text" ng-repeat="tweet in tweets">
+							<img ng-src="{{tweet.user.profile_image_url_https}}" class="md-avatar" alt="{{tweet.user.name}}" />
+							<div class="md-list-item-text">
+								<h3>{{ tweet.user.name }}</h3>
+								<p>{{ tweet.text}}</p>
+								<p>
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 75 72" width="20px" height="20px">
+						  <path d="M70.676 36.644C70.166 35.636 69.13 35 68 35h-7V19c0-2.21-1.79-4-4-4H34c-2.21 0-4 1.79-4 4s1.79 4 4 4h18c.552 0 .998.446 1 .998V35h-7c-1.13 0-2.165.636-2.676 1.644-.51 1.01-.412 2.22.257 3.13l11 15C55.148 55.545 56.046 56 57 56s1.855-.455 2.42-1.226l11-15c.668-.912.767-2.122.256-3.13zM40 48H22c-.54 0-.97-.427-.992-.96L21 36h7c1.13 0 2.166-.636 2.677-1.644.51-1.01.412-2.22-.257-3.13l-11-15C18.854 15.455 17.956 15 17 15s-1.854.455-2.42 1.226l-11 15c-.667.912-.767 2.122-.255 3.13C3.835 35.365 4.87 36 6 36h7l.012 16.003c.002 2.208 1.792 3.997 4 3.997h22.99c2.208 0 4-1.79 4-4s-1.792-4-4-4z"/>
+						</svg> {{tweet.retweet_count}}
+								</p>
+							</div>
+						</md-list-item>
+					</md-list>
+				</div>
+				<div flex></div>
+				<div id="maps" flex="45" style="height: 25em; border: 1px solid blue" class="fix-to-top"  set-class-when-at-top="fix-to-top">map display</div>
+			</div>
+		</div>
+
+
+		<!--TWEETS HORIZONTAL LIST-->
+		<!-- <div class=tweets>
+			<md-content layout-xs="column" layout="row" layout-wrap flex="25">
+				<a class="twitter-timeline" href="https://twitter.com/niyati100">Tweets by TwitterDev</a>
+				<script async src="//platform.twitter.com/widgets.js" charset="utf-8"></script>
+			</md-content>
+		</div> -->
+
+	</main>
+
+	<!--F-O-O-T-E-R-->
+	<footer></footer>
+	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCMws9TigjDRG6cTP2TmHW-l-jlzNtA1Es "></script>
+	<!-- <script>
+		function initMap() {
+		  var mapDiv = document.getElementById('maps');
+		  var map = new google.maps.Map(mapDiv, {
+		        center: {lat: 36.7783, lng: -119.4179},
+		        zoom: 6
+		      });
+		  var myLatLng = {lat: 36.7783, lng: -119.4179};
+		  var marker = new google.maps.Marker({
+			    position: myLatLng,
+			    map: map,
+			    title: 'Hello World!'
+			  });
+		}
+		initMap()
+	</script> -->
+
+
+	<!-- Angular Material requires Angular.js Libraries -->
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular.min.js "></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-animate.min.js "></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-aria.min.js "></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.5.3/angular-messages.min.js "></script>
+
+	<!-- Angular Material Library -->
+	<script src="http://ajax.googleapis.com/ajax/libs/angular_material/1.1.0-rc2/angular-material.min.js "></script>
+
+	<script type="text/javascript " src="index.js "></script>
+
+</body>
+
+</html>

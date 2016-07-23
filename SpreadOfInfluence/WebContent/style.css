@@ -1,0 +1,21 @@
+.toolbardemoBasicUsage md-toolbar md-icon.md-default-theme {
+	color: white; }
+.md-2-line,.md-3-line{
+	background-color: white;
+}
+md-input-container{
+	width: 20em;
+}
+form{
+	display: inline block;
+	margin-left: 3.5em;
+}
+md-card.md-default-theme, md-card {
+    background-color: white;
+}
+.carddemoBasicUsage .card-media {
+ 	background-color: #999999; 
+}
+md-list{
+	height:50%;
+}
